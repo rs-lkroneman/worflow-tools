@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+jira_domain="https://yourdomain.atlassian.net"
+
+help_text() {
+  echo "
+    Usage:
+      jira                              - runs 'jira ticket git', if no ticket in branch shows this prompt
+      jira dashboard                    - takes you to your jira dashboard
+
+      jira ticket git                   - takes you to the ticket currently in your branch
+      jira ticket copy                  - copies the ticket from your branch to your clipboard
+      jira ticket RPLUS-37055           - opens the ticket from the parameter in the browser
+      jira ticket kebab                 - takes a copied ticket description and number and converts it to kebabcase for branch creation
+
+      jira board [board-name]
+      jira board list                   - lists available board names (make sure to uptdate this list when adding boards)
+  "
+}
+
+# --------------------------------------------
+# Takes what is currently in your clipboard and constructs a valid branch name from it.
+# 
+# --------------------------------------------
+kebabcase_branch_ticket() {
+  local args="$(pbpaste)"
+  local one_line="$(echo -n $args)"
+  local remove_colon="${one_line//\:/}"
+  local ticket="$(echo $remove_colon | grep -Eo '^(\w+/)?(\w+[-_])?[0-9]+' | grep -Eo '(\w+[-])?[0-9]+' | tr "[:lower:]" "[:upper:]")"
+
+  non_ticket="${remove_colon//$ticket/}"
+  non_ticket_trimmed=`echo $non_ticket | sed -e 's/^[[:space:]]*//'`
+  kebab_case_non_ticket="${non_ticket_trimmed// /-}"
+  lowercase_kebab_case_non_ticket=`echo $kebab_case_non_ticket | tr '[:upper:]' '[:lower:]'`
+
+  echo -n "$ticket/$lowercase_kebab_case_non_ticket" | pbcopy
+  echo "Copied $ticket/$lowercase_kebab_case_non_ticket to clipboard!"
+}
+
+# --------------------------------------------
+# Util function to open a url in the browser
+# --------------------------------------------
+jira_open() {
+  local jira_open_url="${1}"
+  # if you want it to use your default browser you can do
+  #   open $jira_open_url
+  # or find
+  open -b com.google.Chrome $jira_open_url
+}
+
+# --------------------------------------------
+# Retrieves a jira ticket from your current git branch
+# --------------------------------------------
+git_get_ticket() {
+  current_branch="$(git branch --show-current)"
+  current_ticket="$(echo $current_branch | grep -Eo '^(\w+/)?(\w+[-_])?[0-9]+' | grep -Eo '(\w+[-])?[0-9]+' | tr "[:lower:]" "[:upper:]")"
+  echo $current_ticket  
+}
+
+# --------------------------------------------
+# Handles the jira ticket command
+# --------------------------------------------
+handle_tickets() {
+  ticket_number="${1:-"git"}"
+  case $ticket_number in
+    "git"*)
+      current_ticket="$(git_get_ticket)"
+      if [[ -n $current_ticket ]]; then
+        jira_open "${jira_domain}/browse/${current_ticket}"
+      else
+        echo "
+        No ticket found on branch
+        "
+        jira list
+      fi
+      ;;
+    "copy"*)
+      current_ticket="$(git_get_ticket)"
+      echo -n "$current_ticket" | pbcopy
+      echo "Copied $current_ticket to Clipboard!"
+      ;;
+    "list"*)
+      jira list
+      ;;
+    "kebab"*)
+      kebabcase_branch_ticket
+      ;;
+    *)
+      jira_open "${jira_domain}/browse/${ticket_number}"
+      ;;
+  esac
+}
+
+# --------------------------------------------
+# Handles the jira board command
+# --------------------------------------------
+handle_boards() {
+  board_name="${1}"
+  board_url="/secure/RapidBoard.jspa"
+  case $board_name in
+  "example"*)
+    jira_open "${jira_domain}${board_url}?projectKey=KEY&rapidView=111"
+    ;;
+  "list"*)
+    echo "
+      Usage:
+        jira board example         - takes you to the board you configure
+    "
+    ;;
+  *)
+    jira board list
+    ;;
+  esac
+}
+
+# --------------------------------------------
+# Entrypoint
+# --------------------------------------------
+jira() {
+  local keyword="${1:-"current"}"
+  case $keyword in
+  "dashboard"*)
+    jira_open "${jira_domain}/Dashboard.jspa"
+    ;;
+  "ticket"*)
+    ticket_number="${2}"
+    handle_tickets $ticket_number
+    ;;
+  "board"*)
+    board_name="${2}"
+    handle_boards $board_name
+    ;;
+  "list"*|"help"*)
+    help_text
+    ;;
+  *)
+    # See usage, this grabs your current ticket from your branch and opens it in chrome
+    jira ticket git
+    ;;
+  esac
+}
+
+jira "$@"
