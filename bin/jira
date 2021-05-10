@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jira_domain="https://yourdomain.atlassian.net"
+jira_domain="https://ramseysolutions.atlassian.net"
 
 help_text() {
   echo "
@@ -10,7 +10,7 @@ help_text() {
 
       jira ticket git                   - takes you to the ticket currently in your branch
       jira ticket copy                  - copies the ticket from your branch to your clipboard
-      jira ticket RPLUS-37055           - opens the ticket from the parameter in the browser
+      jira ticket TICKET-1337           - opens the ticket from the parameter in the browser
       jira ticket kebab                 - takes a copied ticket description and number and converts it to kebabcase for branch creation
 
       jira board [board-name]

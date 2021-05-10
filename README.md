@@ -71,6 +71,18 @@ A simple utility script to automate handling tickets from branch names
     jira board my_board
     ```
 
+7. Update the `list` case to include your newly configured board so you can reference `jira board list` for your configured boards
+
+    ```shell
+    "list"*)
+        echo "
+        Usage:
+            jira board example          - takes you to the board you configure
+            jira board my_board         - my project's board
+        "
+        ;;
+    ```
+
 ## Example Workflow
 
 1. Open your jira board
