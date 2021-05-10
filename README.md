@@ -38,7 +38,7 @@ A simple utility script to automate handling tickets from branch names
 
     which should take you to your default dashboard
 
-#### To set up boards
+### To set up boards
 
 1. Navigate to your project's board
 
