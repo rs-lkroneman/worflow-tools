@@ -20,7 +20,6 @@ help_text() {
 
 # --------------------------------------------
 # Takes what is currently in your clipboard and constructs a valid branch name from it.
-# 
 # --------------------------------------------
 kebabcase_branch_ticket() {
   local args="$(pbpaste)"
@@ -44,7 +43,7 @@ jira_open() {
   local jira_open_url="${1}"
   # if you want it to use your default browser you can do
   #   open $jira_open_url
-  # or find
+  # or find the bundle / application name for the browser of your choice.
   open -b com.google.Chrome $jira_open_url
 }
 
