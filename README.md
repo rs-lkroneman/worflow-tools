@@ -4,6 +4,8 @@ A simple utility script to automate handling tickets from branch names
 
 ## Setup
 
+## General Setup
+
 1. Clone this repository or simply copy the jira file out of the bin directory and place it somewhere in your path.
 
     For a list of locations on the path run
