@@ -68,6 +68,7 @@ A simple utility script to automate handling tickets from branch names
 6. You should now be able to open your board by doing
 
     ```shell
+    jira board my_board
     ```
 
 ## Example Workflow
@@ -104,3 +105,7 @@ A simple utility script to automate handling tickets from branch names
 3. Create your branch in the repository using your clipboard
 
 4. when your branch name has a ticket number in it run `jira` and it will take you to the ticket in the branch
+
+    ```shell
+    jira
+    ```
